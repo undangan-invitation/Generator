@@ -1,237 +1,401 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Excel Style Note + Generator ID</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Excel Style Note + Generator ID</title>
 
-<style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
+  <style>
+    :root{
+      font-size: clamp(14px, 1.6vw, 16px);
+      --primary: #007bff;
+      --muted: #aaa;
+      --card-bg: #fff;
+      --gap: 12px;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 18px;
+      background: #f6f7fb;
+      color: #222;
+    }
+
+    .wrap{
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    h2, h3 { margin: 8px 0; }
+
+    .card{
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      margin-bottom: var(--gap);
+    }
 
     table {
         border-collapse: collapse;
         width: 100%;
-        max-width: 400px;
-        margin-bottom: 20px;
-        table-layout: fixed; /* agar kolom tidak melebar */
-        word-break: break-all; /* teks panjang tetap di dalam sel */
+        max-width: 420px;
+        margin-bottom: 12px;
+        table-layout: fixed;
+        word-break: break-all;
+        background: var(--card-bg);
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
     }
     th, td {
-        border: 1px solid #aaa;
-        padding: 6px;
+        border-bottom: 1px solid #eee;
+        padding: 8px;
         text-align: center;
+        vertical-align: middle;
+        font-size: 0.98rem;
     }
+    th { background: #fafafa; font-weight:600; color:#333; }
     td[contenteditable="true"] {
-        background: #fafafa;
+        background: #fff;
         overflow-wrap: break-word;
+        min-height: 40px;
+        text-align: left;
+        padding-left: 10px;
     }
-
-    button { padding: 6px 10px; cursor: pointer; }
 
     .copy-btn {
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
         cursor: pointer;
-        font-size: 17px;
-        color: #007bff;
-        position: relative;
+        font-size: 18px;
+        color: var(--primary);
+        background: transparent;
+        border: none;
+        padding: 8px 10px;
+        border-radius: 8px;
     }
-    .copy-btn:hover { color: #0053b8; }
 
-    /* Switch */
-    .switch { position: relative; display: inline-block; width: 55px; height: 28px; margin-left: 10px; }
+    .switch { position: relative; display: inline-block; width: 55px; height: 28px; margin-left: 10px; vertical-align: middle; }
     .switch input { display: none; }
     .slider {
         position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-        background-color: #ccc; border-radius: 28px; transition: .3s;
+        background-color: #ccc; border-radius: 28px; transition: .25s;
     }
     .slider:before {
         position: absolute; content: "";
         height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white;
-        border-radius: 50%; transition: .3s;
+        border-radius: 50%; transition: .25s;
     }
     input:checked + .slider { background-color: #4CAF50; }
     input:checked + .slider:before { transform: translateX(26px); }
 
     .item {
-        padding: 6px;
+        padding: 8px;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         width: 100%;
-        max-width: 400px;
-        border-bottom: 1px solid #ddd;
+        max-width: 420px;
+        border-bottom: 1px dashed #eee;
         word-break: break-all;
+        font-size: 0.98rem;
     }
 
-    /* Placeholder style */
-    .hp-cell.placeholder {
-        color: #aaa;
-    }
+    .input-placeholder { color: var(--muted); }
 
-    /* Responsif untuk mobile */
-    @media (max-width: 420px) {
+    .tooltip {
+      position: absolute;
+      background: #333;
+      color: #fff;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 6px;
+      transform: translateY(-6px);
+      white-space: nowrap;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity .18s, transform .18s;
+      pointer-events: none;
+    }
+    .tooltip.show { opacity: 1; transform: translateY(-10px); }
+
+    @media (max-width: 520px) {
         body { margin: 10px; }
-        table, .item { max-width: 100%; }
+        .wrap { padding: 8px; }
+        table { max-width: 100%; border: none; box-shadow: none; }
+        thead { display: none; }
+        tr { display: block; margin-bottom: 10px; border-radius: 8px; background: var(--card-bg); border: 1px solid #eee; }
+        td {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        td[data-label]::before {
+            content: attr(data-label);
+            flex: 1 1 40%;
+            color: #666;
+            font-weight:600;
+            margin-right: 8px;
+            text-align: left;
+        }
+        td[contenteditable="true"] { text-align: left; padding-left: 8px; }
+        .copy-btn { padding: 10px 12px; font-size: 20px; }
+        .item { max-width: 100%; padding: 10px; }
     }
-</style>
+
+    @media (min-width: 980px) {
+      .wrap { max-width: 900px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
 
-<h2>ID Generator By Iyus</h2>
+    <h2>ID Generator By Iyus</h2>
 
-<!-- PASSWORD -->
-<h3>Password</h3>
-<table>
-    <tr>
-        <th>Password</th>
-        <th>Copy</th>
-    </tr>
-    <tr>
-        <td id="passCell" contenteditable="true">Masukkan Password</td>
-        <td><span class="copy-btn" onclick="copyPassword()">📋</span></td>
-    </tr>
-</table>
+    <div class="card" aria-labelledby="passwordHeading">
+      <h3 id="passwordHeading">Password</h3>
+      <table id="pwTable" role="table" aria-label="Password table">
+        <thead>
+          <tr><th>Password</th><th>Copy</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="pw1" contenteditable="true" class="pw-cell input-placeholder" data-label="Password">Masukkan Password</td>
+            <td data-label="Copy"><button class="copy-btn" aria-label="Salin password" data-table="pw" data-index="1">📋</button></td>
+          </tr>
+        </tbody>
+      </table>
 
-<!-- TABEL NOMOR HP -->
-<h3>Nomor HP</h3>
-<table id="hpTable">
-    <tr>
-        <th>Nomor HP</th>
-        <th>Copy</th>
-    </tr>
-</table>
+      <label style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="syncPw">
+        <span>Samakan password dengan Nomor HP</span>
+      </label>
+    </div>
 
-<hr>
+    <div class="card" aria-labelledby="hpHeading">
+      <h3 id="hpHeading">Nomor HP</h3>
+      <table id="hpTable" role="table" aria-label="Nomor HP table">
+        <thead><tr><th>Nomor HP</th><th>Copy</th></tr></thead>
+        <tbody>
+          <tr>
+            <td id="hp1" contenteditable="true" class="hp-cell input-placeholder" data-label="Nomor HP">Nomor HP</td>
+            <td data-label="Copy"><button class="copy-btn" aria-label="Salin nomor hp" data-table="hp" data-index="1">📋</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<h2>Generator User ID</h2>
+    <div class="card" aria-labelledby="generatorHeading">
+      <h2 id="generatorHeading">Generator User ID</h2>
 
-<label>Nama User:</label>
-<input type="text" id="username" placeholder="misal: ridwan">
-<button class="icon-btn" onclick="generateRandomName()" style="font-size:20px;">🎲</button>
-<br><br>
+      <label for="username">Nama User:</label><br>
+      <input type="text" id="username" placeholder="misal: ridwan" style="padding:8px; width:60%; max-width:320px; margin-top:6px;">
+      <button class="copy-btn" id="randNameBtn" title="Acak nama" style="margin-left:6px;">🎲</button>
+      <br><br>
 
-<label>Nomor Awal ID:</label>
-<input type="number" id="start" value="1"><br>
+      <label for="start">Nomor Awal ID:</label><br>
+      <input type="number" id="start" value="1" style="padding:8px; width:100px;"><br><br>
 
-<label>Nomor Akhir ID:</label>
-<input type="number" id="end" value="25"><br>
+      <label for="end">Nomor Akhir ID:</label><br>
+      <input type="number" id="end" value="25" style="padding:8px; width:100px;"><br><br>
 
-<label>Nomor di Depan?</label>
-<label class="switch">
-    <input type="checkbox" id="positionSwitch">
-    <span class="slider"></span>
-</label>
-<br><small>(OFF = ridwan001 • ON = 001ridwan)</small><br><br>
+      <label>Nomor di Depan?</label>
+      <label class="switch" title="Toggle posisi nomor">
+        <input type="checkbox" id="positionSwitch">
+        <span class="slider"></span>
+      </label>
+      <small style="display:block; margin-top:6px;">(OFF = ridwan001 • ON = 001ridwan)</small><br><br>
 
-<button onclick="generateIDs()">Generate</button>
+      <button onclick="generateIDs()" style="background:var(--primary); color:#fff; padding:10px 12px; border-radius:8px; border:none;">Generate</button>
 
-<h3>Hasil:</h3>
-<div id="result"></div>
+      <h3 style="margin-top:12px;">Hasil:</h3>
+      <div id="result" aria-live="polite"></div>
+    </div>
+
+  </div>
 
 <script>
-// Buat 2 baris nomor HP tanpa kolom nomor urut
-for (let i = 1; i <= 2; i++) {
-    let row = document.createElement("tr");
-    row.innerHTML = `
-        <td id="hp${i}" contenteditable="true" class="hp-cell placeholder">Nomor HP</td>
-        <td><span class="copy-btn" onclick="copyHP(${i})">📋</span></td>
-    `;
-    hpTable.appendChild(row);
-}
+  const hpCell = document.getElementById('hp1');
+  const pwCell = document.getElementById('pw1');
+  const syncPw = document.getElementById('syncPw');
 
-// Placeholder behavior
-document.querySelectorAll(".hp-cell").forEach(cell => {
-    cell.addEventListener("focus", function() {
-        if (this.classList.contains("placeholder")) {
-            this.innerText = "";
-            this.classList.remove("placeholder");
-        }
+  // Placeholder management for hp and pw (single row each)
+  function applyPlaceholder(cell, defaultText) {
+    if (!cell.innerText || cell.innerText.trim() === '') {
+      cell.innerText = defaultText;
+      cell.classList.add('input-placeholder');
+    }
+  }
+  applyPlaceholder(hpCell, 'Nomor HP');
+  applyPlaceholder(pwCell, 'Masukkan Password');
+
+  document.addEventListener('focusin', (e) => {
+    const t = e.target;
+    if (t === hpCell || t === pwCell) {
+      if (t.classList.contains('input-placeholder')) {
+        t.innerText = '';
+        t.classList.remove('input-placeholder');
+      }
+    }
+  });
+
+  document.addEventListener('focusout', (e) => {
+    const t = e.target;
+    if (t === hpCell) applyPlaceholder(hpCell, 'Nomor HP');
+    if (t === pwCell) applyPlaceholder(pwCell, 'Masukkan Password');
+  });
+
+  // Clipboard helper + tooltip
+  function writeToClipboard(text) {
+    if (!text) return Promise.reject('kosong');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise((resolve, reject) => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (ok) resolve();
+        else reject('execCommand gagal');
+      } catch (err) {
+        document.body.removeChild(ta);
+        reject(err);
+      }
     });
-    cell.addEventListener("blur", function() {
-        if (this.innerText.trim() === "") {
-            this.innerText = "Nomor HP";
-            this.classList.add("placeholder");
-        }
-    });
-});
+  }
 
-// Fungsi tooltip
-function showTooltip(element, message = "Disalin!") {
-    let tooltip = document.createElement("span");
-    tooltip.innerText = message;
-    tooltip.style.position = "absolute";
-    tooltip.style.background = "#333";
-    tooltip.style.color = "#fff";
-    tooltip.style.padding = "2px 6px";
-    tooltip.style.fontSize = "12px";
-    tooltip.style.borderRadius = "4px";
-    tooltip.style.top = "-25px";
-    tooltip.style.right = "0";
-    tooltip.style.zIndex = "100";
-    tooltip.style.opacity = "0";
-    tooltip.style.transition = "opacity 0.3s";
+  function showTooltipOnBtn(btn, message = 'Disalin!') {
+    if (!btn) return;
+    const existing = btn.querySelector('.tooltip');
+    if (existing) existing.remove();
+    const tip = document.createElement('span');
+    tip.className = 'tooltip';
+    tip.textContent = message;
+    btn.style.position = 'relative';
+    btn.appendChild(tip);
+    requestAnimationFrame(() => tip.classList.add('show'));
+    setTimeout(() => {
+      tip.classList.remove('show');
+      setTimeout(() => tip.remove(), 220);
+    }, 1100);
+  }
 
-    element.style.position = "relative";
-    element.appendChild(tooltip);
+  // Delegasi klik salin (hp / pw)
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    const table = btn.getAttribute('data-table');
+    const idx = btn.getAttribute('data-index'); // always "1" here
+    if (!table) return;
+    let cell = document.getElementById(table + idx);
+    const text = cell ? cell.innerText.trim() : '';
+    writeToClipboard(text).then(() => showTooltipOnBtn(btn, table.toUpperCase() + ' disalin'))
+                          .catch(() => showTooltipOnBtn(btn, 'Gagal menyalin'));
+  });
 
-    setTimeout(() => tooltip.style.opacity = "1", 10);
-    setTimeout(() => tooltip.remove(), 1200);
-}
+  // Sync checkbox behavior: when checked, password mirrors hp and is not editable.
+  function updateSyncState() {
+    if (syncPw.checked) {
+      // set pw value from hp (if hp has placeholder, set empty)
+      const hpVal = (hpCell.classList.contains('input-placeholder')) ? '' : hpCell.innerText.trim();
+      pwCell.innerText = hpVal || '';
+      pwCell.classList.remove('input-placeholder');
+      pwCell.setAttribute('contenteditable', 'false');
+      pwCell.style.opacity = '0.9';
+    } else {
+      // allow editing, restore placeholder if empty
+      pwCell.setAttribute('contenteditable', 'true');
+      if (!pwCell.innerText || pwCell.innerText.trim() === '') {
+        pwCell.innerText = 'Masukkan Password';
+        pwCell.classList.add('input-placeholder');
+      }
+    }
+  }
+  syncPw.addEventListener('change', updateSyncState);
 
-// Copy password
-function copyPassword() {
-    let pw = document.getElementById("passCell").innerText.trim();
-    navigator.clipboard.writeText(pw);
-    showTooltip(document.querySelector("#passCell + td .copy-btn"));
-}
+  // If hp changes while sync is active, update pw
+  hpCell.addEventListener('input', () => {
+    if (syncPw.checked) {
+      const hpVal = (hpCell.classList.contains('input-placeholder')) ? '' : hpCell.innerText.trim();
+      pwCell.innerText = hpVal || '';
+      if (!hpVal) pwCell.classList.add('input-placeholder');
+      else pwCell.classList.remove('input-placeholder');
+    }
+  });
 
-// Copy nomor HP
-function copyHP(num) {
-    let hp = document.getElementById("hp" + num).innerText.trim();
-    navigator.clipboard.writeText(hp);
-    showTooltip(document.querySelector(`#hp${num} + td .copy-btn`));
-}
+  // Initialize sync state (unchecked by default)
+  updateSyncState();
 
-// Random name generator
-function generateRandomName() {
-    const names = ["daki","rino","aldo","fijar","vani","selsa","nandi","rame","yoga","aref","dono","riki","dafa","ayu","zahra","fares","timu","bimo","galing","dika","rina","aldi","fajar","vina","salsa","nanda","rama","yogi",
-                   "arif","doni","riko","dafa","alya","zara","faris","timo","bima","gilang"];
-    let n = names[Math.floor(Math.random() * names.length)];
-    let num = Math.floor(10 + Math.random() * 990);
+  // Generator & other utilities (same as before)
+  const randNameBtn = document.getElementById('randNameBtn');
+  randNameBtn.addEventListener('click', generateRandomName);
+  function generateRandomName() {
+    const names = ["daki","rino","aldo","fijar","vani","selsa","nandi","rame","yoga","aref","dono","riki","dafa","ayu","zahra","fares","timu","bimo","galing","dika","rina","aldi","fajar","vina","salsa","nanda","rama","yogi","arif","doni","riko","alya","zara","faris","timo","bima","gilang"];
+    const n = names[Math.floor(Math.random() * names.length)];
+    const num = Math.floor(10 + Math.random() * 990);
     document.getElementById('username').value = n + num;
-}
+  }
 
-// Generate IDs
-function generateIDs() {
+  function generateIDs() {
     const username = document.getElementById('username').value.trim();
-    const start = parseInt(document.getElementById('start').value);
-    const end = parseInt(document.getElementById('end').value);
+    const start = parseInt(document.getElementById('start').value) || 1;
+    const end = parseInt(document.getElementById('end').value) || 1;
     const posFront = document.getElementById('positionSwitch').checked;
-    let result = document.getElementById("result");
-    result.innerHTML = "";
+    const result = document.getElementById('result');
+    result.innerHTML = '';
 
     if (!username) {
-        result.innerHTML = "<p style='color:red'>Nama user kosong!</p>";
-        return;
+      const p = document.createElement('p');
+      p.style.color = 'red';
+      p.textContent = 'Nama user kosong!';
+      result.appendChild(p);
+      return;
     }
+    const s = Math.min(start, end);
+    const e = Math.max(start, end);
 
-    for (let i = start; i <= end; i++) {
-        let number = String(i).padStart(3, '0');
-        let fullID = posFront ? number + username : username + number;
+    for (let i = s; i <= e; i++) {
+      const number = String(i).padStart(3, '0');
+      const fullID = posFront ? number + username : username + number;
 
-        let div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-            <span>${fullID}</span>
-            <span class="copy-btn" onclick="copyText(this, '${fullID}')">📋</span>
-        `;
-        result.appendChild(div);
+      const div = document.createElement('div');
+      div.className = 'item';
+      const spanId = document.createElement('span');
+      spanId.textContent = fullID;
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = '📋';
+      btn.setAttribute('aria-label', 'Salin ' + fullID);
+      btn.addEventListener('click', () => {
+        writeToClipboard(fullID).then(() => showTooltipOnBtn(btn, 'Disalin'))
+                                .catch(() => showTooltipOnBtn(btn, 'Gagal'));
+      });
+      div.appendChild(spanId);
+      div.appendChild(btn);
+      result.appendChild(div);
     }
-}
+  }
 
-// Copy text hasil generate ID
-function copyText(btn, text) {
-    navigator.clipboard.writeText(text);
-    showTooltip(btn);
-}
+  // Prevent Enter from adding newline inside contenteditable
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (document.activeElement && document.activeElement.isContentEditable)) {
+      e.preventDefault();
+      document.activeElement.blur();
+    }
+  });
 </script>
-
 </body>
 </html>
