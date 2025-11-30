@@ -89,8 +89,8 @@
     </tr>
 </table>
 
-<!-- TABEL 25 NOMOR HP -->
-<h3>25 Nomor HP</h3>
+<!-- TABEL NOMOR HP -->
+<h3>Nomor HP</h3>
 <table id="hpTable">
     <tr>
         <th>Nomor HP</th>
@@ -126,8 +126,8 @@
 <div id="result"></div>
 
 <script>
-// Buat 1 baris nomor HP tanpa kolom nomor urut
-for (let i = 1; i <= 1; i++) {
+// Buat 2 baris nomor HP tanpa kolom nomor urut
+for (let i = 1; i <= 2; i++) {
     let row = document.createElement("tr");
     row.innerHTML = `
         <td id="hp${i}" contenteditable="true" class="hp-cell placeholder">Nomor HP</td>
@@ -191,7 +191,7 @@ function copyHP(num) {
 
 // Random name generator
 function generateRandomName() {
-    const names = ["dika","rina","aldi","fajar","vina","salsa","nanda","rama","yogi",
+    const names = ["daki","rino","aldo","fijar","vani","selsa","nandi","rame","yoga","aref","dono","riki","dafa","ayu","zahra","fares","timu","bimo","galing","dika","rina","aldi","fajar","vina","salsa","nanda","rama","yogi",
                    "arif","doni","riko","dafa","alya","zara","faris","timo","bima","gilang"];
     let n = names[Math.floor(Math.random() * names.length)];
     let num = Math.floor(10 + Math.random() * 990);
