@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Excel Style Note + Generator ID</title>
+
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 20px;
+        table-layout: fixed; /* agar kolom tidak melebar */
+        word-break: break-all; /* teks panjang tetap di dalam sel */
+    }
+    th, td {
+        border: 1px solid #aaa;
+        padding: 6px;
+        text-align: center;
+    }
+    td[contenteditable="true"] {
+        background: #fafafa;
+        overflow-wrap: break-word;
+    }
+
+    button { padding: 6px 10px; cursor: pointer; }
+
+    .copy-btn {
+        cursor: pointer;
+        font-size: 17px;
+        color: #007bff;
+        position: relative;
+    }
+    .copy-btn:hover { color: #0053b8; }
+
+    /* Switch */
+    .switch { position: relative; display: inline-block; width: 55px; height: 28px; margin-left: 10px; }
+    .switch input { display: none; }
+    .slider {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #ccc; border-radius: 28px; transition: .3s;
+    }
+    .slider:before {
+        position: absolute; content: "";
+        height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white;
+        border-radius: 50%; transition: .3s;
+    }
+    input:checked + .slider { background-color: #4CAF50; }
+    input:checked + .slider:before { transform: translateX(26px); }
+
+    .item {
+        padding: 6px;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 400px;
+        border-bottom: 1px solid #ddd;
+        word-break: break-all;
+    }
+
+    /* Placeholder style */
+    .hp-cell.placeholder {
+        color: #aaa;
+    }
+
+    /* Responsif untuk mobile */
+    @media (max-width: 420px) {
+        body { margin: 10px; }
+        table, .item { max-width: 100%; }
+    }
+</style>
+</head>
+<body>
+
+<h2>ID Generator By Iyus</h2>
+
+<!-- PASSWORD -->
+<h3>Password</h3>
+<table>
+    <tr>
+        <th>Password</th>
+        <th>Copy</th>
+    </tr>
+    <tr>
+        <td id="passCell" contenteditable="true">Masukkan Password</td>
+        <td><span class="copy-btn" onclick="copyPassword()">📋</span></td>
+    </tr>
+</table>
+
+<!-- TABEL 25 NOMOR HP -->
+<h3>25 Nomor HP</h3>
+<table id="hpTable">
+    <tr>
+        <th>Nomor HP</th>
+        <th>Copy</th>
+    </tr>
+</table>
+
+<hr>
+
+<h2>Generator User ID</h2>
+
+<label>Nama User:</label>
+<input type="text" id="username" placeholder="misal: ridwan">
+<button class="icon-btn" onclick="generateRandomName()" style="font-size:20px;">🎲</button>
+<br><br>
+
+<label>Nomor Awal ID:</label>
+<input type="number" id="start" value="1"><br>
+
+<label>Nomor Akhir ID:</label>
+<input type="number" id="end" value="25"><br>
+
+<label>Nomor di Depan?</label>
+<label class="switch">
+    <input type="checkbox" id="positionSwitch">
+    <span class="slider"></span>
+</label>
+<br><small>(OFF = ridwan001 • ON = 001ridwan)</small><br><br>
+
+<button onclick="generateIDs()">Generate</button>
+
+<h3>Hasil:</h3>
+<div id="result"></div>
+
+<script>
+// Buat 25 baris nomor HP tanpa kolom nomor urut
+for (let i = 1; i <= 25; i++) {
+    let row = document.createElement("tr");
+    row.innerHTML = `
+        <td id="hp${i}" contenteditable="true" class="hp-cell placeholder">Nomor HP</td>
+        <td><span class="copy-btn" onclick="copyHP(${i})">📋</span></td>
+    `;
+    hpTable.appendChild(row);
+}
+
+// Placeholder behavior
+document.querySelectorAll(".hp-cell").forEach(cell => {
+    cell.addEventListener("focus", function() {
+        if (this.classList.contains("placeholder")) {
+            this.innerText = "";
+            this.classList.remove("placeholder");
+        }
+    });
+    cell.addEventListener("blur", function() {
+        if (this.innerText.trim() === "") {
+            this.innerText = "Nomor HP";
+            this.classList.add("placeholder");
+        }
+    });
+});
+
+// Fungsi tooltip
+function showTooltip(element, message = "Disalin!") {
+    let tooltip = document.createElement("span");
+    tooltip.innerText = message;
+    tooltip.style.position = "absolute";
+    tooltip.style.background = "#333";
+    tooltip.style.color = "#fff";
+    tooltip.style.padding = "2px 6px";
+    tooltip.style.fontSize = "12px";
+    tooltip.style.borderRadius = "4px";
+    tooltip.style.top = "-25px";
+    tooltip.style.right = "0";
+    tooltip.style.zIndex = "100";
+    tooltip.style.opacity = "0";
+    tooltip.style.transition = "opacity 0.3s";
+
+    element.style.position = "relative";
+    element.appendChild(tooltip);
+
+    setTimeout(() => tooltip.style.opacity = "1", 10);
+    setTimeout(() => tooltip.remove(), 1200);
+}
+
+// Copy password
+function copyPassword() {
+    let pw = document.getElementById("passCell").innerText.trim();
+    navigator.clipboard.writeText(pw);
+    showTooltip(document.querySelector("#passCell + td .copy-btn"));
+}
+
+// Copy nomor HP
+function copyHP(num) {
+    let hp = document.getElementById("hp" + num).innerText.trim();
+    navigator.clipboard.writeText(hp);
+    showTooltip(document.querySelector(`#hp${num} + td .copy-btn`));
+}
+
+// Random name generator
+function generateRandomName() {
+    const names = ["dika","rina","aldi","fajar","vina","salsa","nanda","rama","yogi",
+                   "arif","doni","riko","dafa","alya","zara","faris","timo","bima","gilang"];
+    let n = names[Math.floor(Math.random() * names.length)];
+    let num = Math.floor(10 + Math.random() * 990);
+    document.getElementById('username').value = n + num;
+}
+
+// Generate IDs
+function generateIDs() {
+    const username = document.getElementById('username').value.trim();
+    const start = parseInt(document.getElementById('start').value);
+    const end = parseInt(document.getElementById('end').value);
+    const posFront = document.getElementById('positionSwitch').checked;
+    let result = document.getElementById("result");
+    result.innerHTML = "";
+
+    if (!username) {
+        result.innerHTML = "<p style='color:red'>Nama user kosong!</p>";
+        return;
+    }
+
+    for (let i = start; i <= end; i++) {
+        let number = String(i).padStart(3, '0');
+        let fullID = posFront ? number + username : username + number;
+
+        let div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+            <span>${fullID}</span>
+            <span class="copy-btn" onclick="copyText(this, '${fullID}')">📋</span>
+        `;
+        result.appendChild(div);
+    }
+}
+
+// Copy text hasil generate ID
+function copyText(btn, text) {
+    navigator.clipboard.writeText(text);
+    showTooltip(btn);
+}
+</script>
+
+</body>
+</html>
